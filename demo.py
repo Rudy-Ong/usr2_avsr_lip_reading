@@ -75,7 +75,16 @@ def load_video_audio(path: str, target_fps: int = 25, target_sr: int = 16000):
             )(audio)
 
     # --- video ---------------------------------------------------------------
-    vfps = info["video_fps"]
+    # Handle different torchvision versions and video formats
+    vfps = info.get("video_fps") or info.get("fps")
+    if not vfps:
+        log.warning(
+            "Could not determine video FPS from metadata. Assuming %d FPS. "
+            "If your video has a different frame rate, results may be degraded. "
+            "Consider re-encoding: ffmpeg -i input.mp4 -r 25 -ar 16000 output.mp4",
+            target_fps
+        )
+        vfps = target_fps
     if abs(vfps - target_fps) > 1e-3:
         n_frames = video.shape[0]
         new_n = int(n_frames / vfps * target_fps)
