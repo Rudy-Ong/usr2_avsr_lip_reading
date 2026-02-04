@@ -11,44 +11,6 @@ import numpy as np
 warnings.filterwarnings("ignore")
 
 
-def _build_ibug_detector(device, model_name):
-    """Build detector using ibug packages (requires manual install via setup_ibug.sh)."""
-    try:
-        from ibug.face_alignment import FANPredictor
-        from ibug.face_detection import RetinaFacePredictor
-    except ImportError:
-        raise ImportError(
-            "ibug packages not found. Install them by running:\n"
-            "  bash preprocessing/setup_ibug.sh\n"
-            "Or use --detector=mediapipe instead (pip install mediapipe)."
-        )
-
-    face_detector = RetinaFacePredictor(
-        device=device,
-        threshold=0.8,
-        model=RetinaFacePredictor.get_model(model_name),
-    )
-    landmark_detector = FANPredictor(device=device, model=None)
-
-    def detect(video_frames):
-        landmarks = []
-        for frame in video_frames:
-            detected_faces = face_detector(frame, rgb=True)
-            face_points, _ = landmark_detector(frame, detected_faces, rgb=True)
-            if len(detected_faces) == 0:
-                landmarks.append(None)
-            else:
-                max_id, max_size = 0, 0
-                for idx, bbox in enumerate(detected_faces):
-                    bbox_size = (bbox[2] - bbox[0]) + (bbox[3] - bbox[1])
-                    if bbox_size > max_size:
-                        max_id, max_size = idx, bbox_size
-                landmarks.append(face_points[max_id])
-        return landmarks
-
-    return detect
-
-
 class _MediaPipeDetector:
     """Wrapper for MediaPipe FaceLandmarker with proper cleanup."""
 
@@ -132,18 +94,8 @@ def _build_mediapipe_detector():
 
 
 class LandmarksDetector:
-    def __init__(self, device="cuda:0", model_name="resnet50", detector="retinaface"):
-        """
-        Args:
-            device: torch device string (used by ibug backend only).
-            model_name: RetinaFace model name (used by ibug backend only).
-            detector: "retinaface" (ibug, requires setup_ibug.sh) or
-                      "mediapipe" (pip install mediapipe).
-        """
-        if detector == "mediapipe":
-            self._detect = _build_mediapipe_detector()
-        else:
-            self._detect = _build_ibug_detector(device, model_name)
+    def __init__(self, **kwargs):
+        self._detect = _build_mediapipe_detector()
 
     def __call__(self, video_frames):
         return self._detect(video_frames)

@@ -37,36 +37,22 @@ sudo apt-get install ffmpeg
 
 # macOS
 brew install ffmpeg
-
-# conda
-conda install -c conda-forge ffmpeg
 ```
 
-### Step 1: Install Python dependencies
+### Step 1: Install PyTorch
+
+Install PyTorch, torchaudio, and torchvision for your system from [pytorch.org](https://pytorch.org/get-started/locally/). For example:
+```bash
+pip install torch torchaudio torchvision --index-url https://download.pytorch.org/whl/cu121
+```
+
+### Step 2: Install remaining dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-This installs all required packages, including [MediaPipe](https://github.com/google-ai-edge/mediapipe) for face landmark detection (used for mouth cropping).
-
-### Step 2 (optional): Use ibug RetinaFace instead of MediaPipe
-
-<details>
-<summary>The default MediaPipe detector works well for most cases. If you need higher-accuracy face detection, you can install the ibug RetinaFace + FAN backend instead.</summary>
-
-The ibug packages are not on PyPI and must be installed from source. A helper script is provided:
-```bash
-bash preprocessing/setup_ibug.sh
-```
-This clones and installs [ibug face_detection](https://github.com/hhj1897/face_detection) and [ibug face_alignment](https://github.com/hhj1897/face_alignment). Requires `git-lfs`.
-
-Once installed, pass `detector=retinaface` to use it:
-```bash
-python demo.py video=video.mp4 model.pretrained_model_path=model.pth detector=retinaface
-```
-
-</details>
+This installs all remaining packages, including [MediaPipe](https://github.com/google-ai-edge/mediapipe) for face landmark detection (used for mouth cropping).
 
 ---
 
@@ -332,17 +318,7 @@ Test CSVs:
 
 ### 2. Extract mouth ROIs
 
-Install a [face landmark detector](#face-landmark-detector) if you haven't already, then:
-
 ```bash
-# Using mediapipe (no extra install beyond pip)
-python preprocessing/extract_mouths.py \
-  --src_dir /path/to/raw/videos \
-  --tgt_dir /path/to/mouth/videos \
-  --landmarks_dir /path/to/landmarks \
-  --detector mediapipe
-
-# Using ibug retinaface (default, requires setup_ibug.sh)
 python preprocessing/extract_mouths.py \
   --src_dir /path/to/raw/videos \
   --tgt_dir /path/to/mouth/videos \

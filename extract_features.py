@@ -49,24 +49,7 @@ def extract(video_path: str, cfg: DictConfig, modality: str = "av",
     video_frames, audio = load_video_audio(video_path)
 
     log.info("Detecting landmarks and cropping mouth region ...")
-    # Auto-detect landmark detector (same as demo.py)
-    detector = cfg.get("detector", "auto")
-    if detector == "auto":
-        try:
-            import mediapipe  # noqa: F401
-            detector = "mediapipe"
-        except ImportError:
-            try:
-                from ibug.face_detection import RetinaFacePredictor  # noqa: F401
-                detector = "retinaface"
-            except ImportError:
-                raise ImportError(
-                    "No landmark detector found. Install one of:\n"
-                    "  pip install mediapipe\n"
-                    "  bash preprocessing/setup_ibug.sh"
-                )
-        log.info("Auto-detected landmark detector: %s", detector)
-    ld = LandmarksDetector(device=str(device), detector=detector)
+    ld = LandmarksDetector()
     vp = VideoProcess(convert_gray=False)
     video_tensor = preprocess_video(video_frames, ld, vp)
     ld.close()  # Explicitly close to avoid Python 3.13+ shutdown errors
