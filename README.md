@@ -7,7 +7,7 @@ A unified model for **audio**, **visual**, and **audio-visual** speech recogniti
 **Training paradigm:** USR 2.0 uses self-supervised pre-training followed by semi-supervised fine-tuning. We provide both the [self-supervised checkpoints](#self-supervised-encoder-only) (for extracting representations for your own downstream tasks) and the [fine-tuned checkpoints](#fine-tuned-full-model) (for speech recognition). See [Extract Encoder Features](#extract-encoder-features) for details on using either type.
 
 <p align="center">
-  <img src="assets/demo.gif" width="400">
+  <img src="assets/demo.gif" width="800">
 </p>
 
 <p align="center">
