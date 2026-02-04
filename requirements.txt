@@ -9,8 +9,6 @@ torchmetrics
 numpy
 tqdm
 av
-# Optional: mediapipe backend (easy install, no git cloning needed)
-# pip install mediapipe
-#
-# Optional: ibug backend (requires manual install, see setup_ibug.sh)
+mediapipe
+# Optional: ibug backend (higher accuracy, requires manual install, see setup_ibug.sh)
 # ibug.face_detection and ibug.face_alignment must be installed from source

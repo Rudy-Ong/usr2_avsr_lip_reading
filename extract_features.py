@@ -49,9 +49,27 @@ def extract(video_path: str, cfg: DictConfig, modality: str = "av",
     video_frames, audio = load_video_audio(video_path)
 
     log.info("Detecting landmarks and cropping mouth region ...")
-    ld = LandmarksDetector(device=str(device), model_name="mobilenet0.25")
+    # Auto-detect landmark detector (same as demo.py)
+    detector = cfg.get("detector", "auto")
+    if detector == "auto":
+        try:
+            import mediapipe  # noqa: F401
+            detector = "mediapipe"
+        except ImportError:
+            try:
+                from ibug.face_detection import RetinaFacePredictor  # noqa: F401
+                detector = "retinaface"
+            except ImportError:
+                raise ImportError(
+                    "No landmark detector found. Install one of:\n"
+                    "  pip install mediapipe\n"
+                    "  bash preprocessing/setup_ibug.sh"
+                )
+        log.info("Auto-detected landmark detector: %s", detector)
+    ld = LandmarksDetector(device=str(device), detector=detector)
     vp = VideoProcess(convert_gray=False)
     video_tensor = preprocess_video(video_frames, ld, vp)
+    ld.close()  # Explicitly close to avoid Python 3.13+ shutdown errors
 
     log.info("Loading model from: %s", cfg.model.pretrained_model_path)
     model = load_model(cfg, cfg.model.pretrained_model_path, device)
@@ -63,9 +81,9 @@ def extract(video_path: str, cfg: DictConfig, modality: str = "av",
     modality = modality.lower()
 
     if modality in ("av", "all"):
-        feat_v = model.encoder(xs_v=video_input)
-        feat_a = model.encoder(xs_a=audio_input)
-        feat_av = model.encoder(xs_v=video_input, xs_a=audio_input)
+        feat_v, feat_a, feat_av = model.encoder(
+            xs_v=video_input, xs_a=audio_input, return_all=True,
+        )
         features["video"] = feat_v.squeeze(0).cpu().numpy()
         features["audio"] = feat_a.squeeze(0).cpu().numpy()
         features["audio_visual"] = feat_av.squeeze(0).cpu().numpy()

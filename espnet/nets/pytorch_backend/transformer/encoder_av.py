@@ -95,14 +95,17 @@ class Encoder(torch.nn.Module):
         self.linear_v = nn.Linear(idim, attention_dim)
         self.linear_av = nn.Linear(2*idim, attention_dim)
 
-    def forward(self, xs_v=None, xs_a=None, masks=None):
+    def forward(self, xs_v=None, xs_a=None, masks=None, return_all=False):
         """Encode input sequence.
 
         :param torch.Tensor xs_v: video input tensor (optional)
         :param torch.Tensor xs_a: audio input tensor (optional)
         :param torch.Tensor masks: input mask
-        :return: encoded tensor
-        :rtype: torch.Tensor
+        :param bool return_all: if True and both xs_v and xs_a are given,
+            return (feat_v, feat_a, feat_av) in a single batched forward pass
+            through the shared transformer layers.
+        :return: encoded tensor, or tuple of three tensors when return_all=True
+        :rtype: torch.Tensor or tuple[torch.Tensor, torch.Tensor, torch.Tensor]
         """
         assert xs_v is not None or xs_a is not None
 
@@ -111,6 +114,36 @@ class Encoder(torch.nn.Module):
         if xs_a is not None:
             xs_a = self.frontend_a(xs_a)
 
+        if return_all:
+            assert xs_v is not None and xs_a is not None, \
+                "return_all requires both video and audio inputs"
+            xs_v_proj = self.linear_v(xs_v)
+            xs_a_proj = self.linear_a(xs_a)
+            xs_av_proj = self.linear_av(torch.cat([xs_v, xs_a], dim=-1))
+
+            # Batch all three modalities: (3*B, T, D)
+            xs = torch.cat([xs_v_proj, xs_a_proj, xs_av_proj], dim=0)
+
+            if masks is None:
+                masks = torch.ones(
+                    xs.shape[0], 1, xs.shape[1],
+                    dtype=torch.bool, device=xs.device,
+                )
+            else:
+                masks = masks.repeat(3, 1, 1)
+
+            xs = self.embed(xs)
+            xs, masks = self.encoders(xs, masks)
+
+            if isinstance(xs, tuple):
+                xs = xs[0]
+
+            xs = self.after_norm(xs)
+
+            B = xs.shape[0] // 3
+            return xs[:B], xs[B:2*B], xs[2*B:]
+
+        # Single-modality path
         if xs_v is not None and xs_a is not None:
             xs = self.linear_av(torch.cat([xs_v, xs_a], dim=-1))
         else:

@@ -7,6 +7,10 @@ A unified model for **audio**, **visual**, and **audio-visual** speech recogniti
 **Training paradigm:** USR 2.0 uses self-supervised pre-training followed by semi-supervised fine-tuning. We provide both the [self-supervised checkpoints](#self-supervised-encoder-only) (for extracting representations for your own downstream tasks) and the [fine-tuned checkpoints](#fine-tuned-full-model) (for speech recognition). See [Extract Encoder Features](#extract-encoder-features) for details on using either type.
 
 <p align="center">
+  <img src="assets/demo.gif" width="400">
+</p>
+
+<p align="center">
   <a href="#installation">Installation</a> &bull;
   <a href="#transcribe-a-video">Demo</a> &bull;
   <a href="#extract-encoder-features">Features</a> &bull;
@@ -15,38 +19,54 @@ A unified model for **audio**, **visual**, and **audio-visual** speech recogniti
   <a href="#citation">Citation</a>
 </p>
 
-<table align="center">
-<tr>
-<td valign="middle"><img src="assets/demo.gif" width="150"></td>
-<td valign="middle"><img src="assets/arrow.svg" width="50"></td>
-<td valign="middle"><h3>"WE DON'T USE VIDEO, WE DON'T USE AUDIO"</h3></td>
-</tr>
-</table>
-
 ---
 
 ## Installation
+
+### Prerequisites
+
+FFmpeg is required for video/audio processing. Check if it is installed:
+```bash
+ffmpeg -version
+```
+
+If not, install it:
+```bash
+# Ubuntu / Debian
+sudo apt-get install ffmpeg
+
+# macOS
+brew install ffmpeg
+
+# conda
+conda install -c conda-forge ffmpeg
+```
+
+### Step 1: Install Python dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Face landmark detector
+This installs all required packages, including [MediaPipe](https://github.com/google-ai-edge/mediapipe) for face landmark detection (used for mouth cropping).
 
-A face landmark detector is required for mouth cropping (used by `demo.py`, `extract_features.py`, and `preprocessing/extract_mouths.py`). Two backends are supported:
+### Step 2 (optional): Use ibug RetinaFace instead of MediaPipe
 
-**Option A: MediaPipe (recommended — simple pip install)**
-```bash
-pip install mediapipe
-```
-
-**Option B: ibug RetinaFace + FAN (original, higher accuracy)**
+<details>
+<summary>The default MediaPipe detector works well for most cases. If you need higher-accuracy face detection, you can install the ibug RetinaFace + FAN backend instead.</summary>
 
 The ibug packages are not on PyPI and must be installed from source. A helper script is provided:
 ```bash
 bash preprocessing/setup_ibug.sh
 ```
 This clones and installs [ibug face_detection](https://github.com/hhj1897/face_detection) and [ibug face_alignment](https://github.com/hhj1897/face_alignment). Requires `git-lfs`.
+
+Once installed, pass `detector=retinaface` to use it:
+```bash
+python demo.py video=video.mp4 model.pretrained_model_path=model.pth detector=retinaface
+```
+
+</details>
 
 ---
 
@@ -133,9 +153,9 @@ Load in Python:
 import torch
 
 features = torch.load("features.pt")
-features["audio_visual"]  # numpy array, shape (T, D) — e.g. (38, 512)
-features["video"]          # visual encoder output
-features["audio"]          # audio encoder output
+features["audio_visual"]  # numpy array, shape (T, D) — fused audio-visual encoder output
+features["video"]          # numpy array, shape (T, D) — visual encoder output
+features["audio"]          # numpy array, shape (T, D) — audio encoder output
 ```
 
 ---
@@ -202,6 +222,12 @@ python main.py ... decode.beam_size=1 decode.ctc_weight=0.0
 | `decode.beam_size` | 40 | Beam search width |
 | `decode.ctc_weight` | 0.1 | CTC weight (0.0 = pure attention) |
 | `decode.maxlenratio` | 1.0 | Max output length ratio |
+
+**Speed tip:** For faster decoding at the cost of some accuracy, reduce the beam size and disable CTC rescoring:
+```bash
+decode.beam_size=1 decode.ctc_weight=0.0
+```
+The default (`beam_size=40`, `ctc_weight=0.1`) gives the best results but is slower. Intermediate values (e.g., `beam_size=10`) offer a middle ground.
 
 </details>
 
@@ -296,6 +322,8 @@ Test CSVs:
 
 ### 1. Download datasets
 
+> **Note:** Several of these datasets are no longer available for download from their official sources. Unfortunately there is nothing we can do about this. If you need access to a specific dataset, we recommend contacting the original authors directly.
+
 - [LRS3](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html)
 - [LRS2](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html)
 - [VoxCeleb2](https://www.robots.ox.ac.uk/~vgg/data/voxceleb/vox2.html)
@@ -345,6 +373,10 @@ Edit `conf/data/default.yaml` and set the video/audio directory prefixes for eac
 ## Architecture
 
 <p align="center"><img src="assets/overview_usr2.png" width="65%"></p>
+
+---
+
+## Repository Structure
 
 ```
 .

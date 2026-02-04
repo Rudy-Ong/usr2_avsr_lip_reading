@@ -15,7 +15,9 @@ class USRModel(nn.Module):
         self.eos = self.odim - 1
 
     def get_encoded_features(self, video, audio, padding_mask):
-        return self.backbone.encoder(video, audio, padding_mask)
+        return self.backbone.encoder(
+            xs_v=video, xs_a=audio, masks=padding_mask, return_all=True,
+        )
 
 
 class USR(nn.Module):
