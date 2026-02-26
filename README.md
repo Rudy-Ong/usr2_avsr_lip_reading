@@ -4,6 +4,8 @@
 
 A unified model for **audio**, **visual**, and **audio-visual** speech recognition.
 
+[![arXiv](https://img.shields.io/badge/arXiv-2602.19316-b31b1b.svg)](https://arxiv.org/abs/2602.19316)
+
 **Training paradigm:** USR 2.0 uses self-supervised pre-training followed by semi-supervised fine-tuning. We provide both the [self-supervised checkpoints](#self-supervised-encoder-only) (for extracting representations for your own downstream tasks) and the [fine-tuned checkpoints](#fine-tuned-full-model) (for speech recognition). See [Extract Encoder Features](#extract-encoder-features) for details on using either type.
 
 <p align="center">
@@ -11,6 +13,7 @@ A unified model for **audio**, **visual**, and **audio-visual** speech recogniti
 </p>
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2602.19316">Paper</a> &bull;
   <a href="#installation">Installation</a> &bull;
   <a href="#transcribe-a-video">Demo</a> &bull;
   <a href="#extract-encoder-features">Features</a> &bull;
