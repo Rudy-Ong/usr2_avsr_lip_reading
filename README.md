@@ -408,11 +408,11 @@ Edit `conf/data/default.yaml` and set the video/audio directory prefixes for eac
 ## Citation
 
 ```bibtex
-@article{usr2,
+@article{haliassos2026pay,
   title={Pay Attention to CTC: Fast and Robust Pseudo-Labelling for Unified Speech Recognition},
-  author={},
-  journal={},
-  year={2025}
+  author={Haliassos, Alexandros and Mira, Rodrigo and Petridis, Stavros},
+  journal={arXiv preprint arXiv:2602.19316},
+  year={2026}
 }
 ```
 
