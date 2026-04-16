@@ -2,7 +2,6 @@ import numpy as np
 import torch
 from torchmetrics import Metric
 
-
 def get_wer(s, ref):
     return get_er(s.split(), ref.split())
 
