@@ -17,11 +17,10 @@ compile_model: True
 gpus:
 video:
 modality: av
-detector: mediapipe # if you install ibug packages, detector can be changed to retinaface
-output: features.pt
-use_csv_eval: False # Whether to use CSV file for evaluation. If False, the model will be evaluated on the fly.
+detector: mediapipe 
+use_csv_eval: False 
 csv_path: 
-max_rows: -1 #-1 for all rows change to 5 for only 5 rows
-mouth_roi_root: data/mouth_roi_with_audio # if already processed
-audio_root: data/audio # Added for audio modality
-use_mouth_roi_input: True # Whether to use mouth ROI as input to the model. If False, the full frame will be used.
+max_rows:
+mouth_roi_root: data/mouth_roi_with_audio 
+audio_root: data/audio 
+use_mouth_roi_input: True 

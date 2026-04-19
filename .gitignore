@@ -9,3 +9,7 @@ __pycache__/
 /data_utils_fast.cpython*
 /*.log
 CLAUDE.md
+/*.pth
+audio/
+mouth_roi/
+mouth_roi_with_audio/

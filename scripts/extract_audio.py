@@ -2,15 +2,14 @@ import pandas as pd
 import os
 import subprocess
 
-df = pd.read_csv("path/to/your.csv") # change the csv to extract other audio files
+df = pd.read_csv("csv/your_filepath_here.csv") 
 
-AUDIO_DIR = "path/to/audio/" #
+AUDIO_DIR = "data/audio" 
 os.makedirs(AUDIO_DIR, exist_ok=True)
 
 for idx, row in df.iterrows():
-    video_path = row["video_path"] # example video_path: data/lrs2/main/6330311066473698535/00011.mp4
+    video_path = row["video_path"] 
     if os.path.exists(video_path):
-        # Split by the slash
         parts = video_path.split("/")
 
         # Get the second to last item for the directory

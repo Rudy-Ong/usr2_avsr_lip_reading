@@ -17,4 +17,4 @@ hydra-core>=1.3,<1.4
 omegaconf>=2.3,<3.0
 torchmetrics>=0.11,<1.0
 wandb>=0.15
-torchcodec>=0.0.9  # because torchvision.io.read_video() deprecated
+torchcodec>=0.0.9

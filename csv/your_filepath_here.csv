@@ -1,2 +1,2 @@
 dataset, video_path, audio_path, text_label, status, prediction_text, wer
-dataset_name, /path/to/video1.mp4, /path/to/audio1.wav, "hello world", ok, "hello world", 0.0
+data, data/dataset_here/video.mp4, data/audio/audio.wav, "TEXT EXAMPLE", ok, "text example", 0.0
