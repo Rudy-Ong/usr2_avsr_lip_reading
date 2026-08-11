@@ -1,0 +1,49 @@
+
+# USR 2.0 - recommended Python package pins
+#
+# Notes:
+# - PyTorch (torch / torchvision / torchaudio) should be installed according
+#   to your CUDA / CPU setup. See https://pytorch.org/ for the exact pip
+#   command for a given CUDA version. The lines below allow pip to select the
+#   appropriate wheel if you don't need a CUDA-specific URL. If you need a
+#   CUDA-specific install (recommended for GPU), replace the torch/torchaudio
+#   lines with the exact command from pytorch.org.
+# - Some packages (torchcodec, face alignment/detection backends) are optional
+#   and only required for certain workflows.
+
+# Core ML stack (PyTorch ecosystem)
+torch>=2.2.0,<3.0
+torchvision>=0.16.0,<1.0
+torchaudio>=2.2.0,<3.0
+
+# Training / experiment infra
+pytorch-lightning>=2.0,<3.0
+hydra-core>=1.3,<1.4
+omegaconf>=2.3,<3.0
+torchmetrics>=0.11,<1.0
+
+# Data / utils
+numpy>=1.24,<2.0
+opencv-python>=4.7.0
+tqdm>=4.65
+av>=10.0.0
+pandas>=2.0
+
+# Media / vision / face preprocessing
+mediapipe>=0.10,<1.0    # used by LandmarksDetector (mediapipe tasks)
+face-alignment>=1.3.5   # optional: if you prefer the pip package for face alignment
+retina-face>=0.0.6     # optional: retina-face implementations (varies by project)
+
+# Optional / auxiliary (useful but not strictly required for minimal runs)
+wandb>=0.15
+torchcodec>=0.0.9      # optional: faster video decoding if available
+
+# Small runtime deps
+six>=1.16
+
+# If you need GPU-optimized PyTorch, install torch/torchvision/torchaudio using
+# the official command (example for CUDA 11.8):
+#   pip install --index-url https://download.pytorch.org/whl/cu118 \
+#       torch==2.2.0+cu118 torchvision==0.16.0+cu118 torchaudio==2.2.0+cu118
+
+# End of file
